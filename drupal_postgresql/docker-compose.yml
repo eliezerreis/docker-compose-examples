@@ -1,0 +1,62 @@
+# Drupal with PostgreSQL
+#
+# Access over "http://localhost"
+#
+# During initial Drupal setup,
+# Database type: PostgreSQL
+# Database name: drupal
+# Database username: drupal
+# Database password: mypass or the password defined in docker secrets
+# ADVANCED OPTIONS
+# - HOST: drupaldb
+# - PORT: 5432 
+# even if you are fowarding to a different 
+# port this is the exposed port inside containers network
+
+version: '3.7'
+
+services:
+  drupal:
+    image: drupal:latest
+    ports:
+      - 80:80
+    environment:
+      POSTGRES_DB: drupal
+      POSTGRES_USER: drupal
+      POSTGRES_PASSWORD: mypass
+    volumes:
+      - drupal-modules:/var/www/html/modules
+      - drupal-profiles:/var/www/html/profiles
+      - drupal-themes:/var/www/html/themes
+      - drupal-sites:/var/www/html/sites
+    networks: 
+      backend:
+  drupaldb:
+    image: postgres:latest
+    ports:
+      - 5433:5432
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypass
+      #Use docker secrets to pass sensitive information
+      #POSTGRES_PASSWORD_FILE: /run/secrets/postgres-passwd
+      DRUPAL_DB: drupal
+      DRUPAL_USER: drupal
+      DRUPAL_PASSWORD: mypass
+      #Again use docker secrets to pass sensitive information
+    volumes:
+      - drupal-db:/var/lib/postgresql/data
+      - ./drupal-init.sh:/docker-entrypoint-initdb.d/drupal-init.sh
+    networks: 
+        backend:
+networks: 
+  backend:
+volumes:
+  drupal-modules:
+  drupal-profiles:
+  drupal-themes:
+  drupal-sites:
+  drupal-db:
+    
+
+
