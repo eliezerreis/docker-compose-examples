@@ -1,5 +1,5 @@
-# Docker Compose Examples
-Collection of docker-compose examples for different scenarios. The motivation of this project is to keep tracking of new releases and to document real-world scenarios for a production environment. Feel free to contribute with more scenarios.
+# Docker Samples
+Collection of docker-compose, swarm and kubernetes samples for different scenarios. The motivation of this project is to keep tracking of new releases and to document real-world scenarios for a production environment. Feel free to contribute with more scenarios.
 
 # Overview
 
