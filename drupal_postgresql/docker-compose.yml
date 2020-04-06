@@ -13,6 +13,11 @@
 # even if you are fowarding to a different 
 # port this is the exposed port inside containers network
 
+#
+# Check docker-stack to create secrets using Swarm 
+# orchestration
+#
+
 version: '3.7'
 
 services:
@@ -24,13 +29,15 @@ services:
       POSTGRES_DB: drupal
       POSTGRES_USER: drupal
       POSTGRES_PASSWORD: mypass
+      #Use docker secrets to pass sensitive information
+      #POSTGRES_PASSWORD: /run/secrets/pg-drupal-pass
     volumes:
       - drupal-modules:/var/www/html/modules
       - drupal-profiles:/var/www/html/profiles
       - drupal-themes:/var/www/html/themes
       - drupal-sites:/var/www/html/sites
     networks: 
-      backend:
+      - backend
   drupaldb:
     image: postgres:latest
     ports:
@@ -39,16 +46,19 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypass
       #Use docker secrets to pass sensitive information
-      #POSTGRES_PASSWORD_FILE: /run/secrets/postgres-passwd
+      #POSTGRES_PASSWORD_FILE: /run/secrets/pg-root-pass
+     
+      #Variables used inside init-db scripts to not use root user of db.
       DRUPAL_DB: drupal
       DRUPAL_USER: drupal
       DRUPAL_PASSWORD: mypass
       #Again use docker secrets to pass sensitive information
+      #DRUPAL_PASSWORD_FILE: /run/secrets/pg-drupal-pass
     volumes:
       - drupal-db:/var/lib/postgresql/data
       - ./drupal-init.sh:/docker-entrypoint-initdb.d/drupal-init.sh
     networks: 
-        backend:
+        - backend
 networks: 
   backend:
 volumes:
