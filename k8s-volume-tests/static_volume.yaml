@@ -44,6 +44,6 @@ spec:
       - mountPath: /my-pv-path/data2
         name: vol
   volumes:
-    - name: vol-claim
+    - name: vol
       persistentVolumeClaim:
        claimName: vol-claim
