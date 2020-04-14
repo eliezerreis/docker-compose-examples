@@ -1,0 +1,49 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: vol
+  labels:
+    type: local
+spec:
+  storageClassName: pv-demo 
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    #change to the correct path
+    path: <path inside host>
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: vol-claim
+spec:
+  storageClassName: pv-demo 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+  - image: alpine
+    imagePullPolicy: IfNotPresent
+    name: vol-container
+
+    command: ['sh', '-c', 'echo Container 1 is Running ; sleep 3600']
+
+    volumeMounts:
+      - mountPath: /my-pv-path/data1
+        name: vol
+      - mountPath: /my-pv-path/data2
+        name: vol
+  volumes:
+    - name: vol-claim
+      persistentVolumeClaim:
+       claimName: vol-claim
