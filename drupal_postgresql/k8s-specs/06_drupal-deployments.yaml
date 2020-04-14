@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: drupal
+  name: drupal
+  namespace: drupal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drupal
+  template:
+    metadata:
+      labels:
+        app: drupal
+        tier: frontend
+    spec:
+      initContainers:
+       # keep default files for the drupal installer, and chown.
+        - name: init-drupal-data
+          image: drupal:latest
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c']
+          args: ['cp -r -u /var/www/html/sites/* /tmp/drupal; chown -R www-data:www-data /tmp/drupal']
+          volumeMounts:
+            - name: vol-drupal
+              mountPath: /tmp/drupal
+              subPath: sites
+      securityContext:
+        # www-data
+        fsGroup: 33
+      containers:
+        - image: drupal:latest
+          name: drupal
+          env:
+            - name: POSTGRES_DB
+              value: drupal
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          ports:
+            - containerPort: 80
+              name: drupal
+          volumeMounts:
+            - mountPath: /var/www/html/modules
+              name: vol-drupal
+              subPath: modules
+            - mountPath: /var/www/html/profiles
+              name:  vol-drupal
+              subPath: profiles
+            - mountPath: /var/www/html/sites
+              name: vol-drupal
+              subPath: sites
+            - mountPath: /var/www/html/themes
+              name: vol-drupal
+              subPath: themes
+      volumes:
+      - name: vol-drupal
+        persistentVolumeClaim:
+          claimName: drupal-claim
