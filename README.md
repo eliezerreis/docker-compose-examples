@@ -50,6 +50,26 @@ docker stack rm <service-name>
 #clean databases and volumes
 docker volume prune
 ```
+
+# Basic Kubernetes Commands
+
+> running in declarative mode
+
+```
+cd [folder]
+kubectl apply -f k8s-specs/
+```
+
+> monitoring
+
+`kubectl logs deploy/<servicename> -n namespace --follow`
+
+> clean up
+
+```shell
+kubectl delete -f k8s-specs
+```
+
 # Key features
 
 The examples include option to create database user for the application avoiding using root user as in most of the samples. Also, create scripts that allow use `secrets` even for custom database users.
